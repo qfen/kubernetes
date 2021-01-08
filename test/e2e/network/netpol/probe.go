@@ -53,7 +53,7 @@ func ProbePodToPodConnectivity(k8s *Scenario, model *Model, testCase *TestCase) 
 	for _, podFrom := range allPods {
 		for _, podTo := range allPods {
 			jobs <- &ProbeJob{
-				PodFrom:	podFrom,
+				PodFrom:        podFrom,
 				PodTo:          podTo,
 				ToPort:         testCase.ToPort,
 				ToPodDNSDomain: model.DNSDomain,
