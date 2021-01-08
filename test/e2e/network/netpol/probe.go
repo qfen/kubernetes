@@ -94,10 +94,9 @@ func probeWorker(k8s *Scenario, jobs <-chan *ProbeJob, results chan<- *ProbeJobR
 			podFrom.Namespace,
 			podFrom.Name,
 			podFrom.Containers[0].Name(),
-			job.PodTo.QualifiedServiceAddress(
-				job.ToPodDNSDomain),
-				job.Protocol,
-				job.ToPort)
+			job.PodTo.QualifiedServiceAddress(job.ToPodDNSDomain),
+			job.Protocol,
+			job.ToPort)
 
 		result := &ProbeJobResults{
 			Job:         job,
