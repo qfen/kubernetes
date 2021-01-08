@@ -26,7 +26,6 @@ import (
 type ProbeJob struct {
 	PodFrom        *Pod
 	PodTo          *Pod
-	FromPort       int
 	ToPort         int
 	ToPodDNSDomain string
 	Protocol       v1.Protocol
@@ -54,9 +53,7 @@ func ProbePodToPodConnectivity(k8s *Scenario, model *Model, testCase *TestCase) 
 	for _, podFrom := range allPods {
 		for _, podTo := range allPods {
 			jobs <- &ProbeJob{
-				PodFrom:        podFrom,
 				PodTo:          podTo,
-				FromPort:       testCase.FromPort,
 				ToPort:         testCase.ToPort,
 				ToPodDNSDomain: model.DNSDomain,
 				Protocol:       testCase.Protocol,
@@ -91,27 +88,23 @@ func probeWorker(k8s *Scenario, jobs <-chan *ProbeJob, results chan<- *ProbeJobR
 	defer ginkgo.GinkgoRecover()
 	for job := range jobs {
 		podFrom := job.PodFrom
-		containerFrom, err := podFrom.FindContainer(int32(job.FromPort), job.Protocol)
-		// 1) sanity check that the pod container is found before we run the real test.
-		if err != nil {
-			result := &ProbeJobResults{
-				Job:         job,
-				IsConnected: false,
-				Err:         err,
-				Command:     "(skipped, pod unavailable)",
-			}
-			results <- result
-		} else {
-			// 2) real test runs here...
-			connected, command, err := k8s.Probe(podFrom.Namespace, podFrom.Name, containerFrom.Name(), job.PodTo.QualifiedServiceAddress(job.ToPodDNSDomain), job.Protocol, job.ToPort)
-			result := &ProbeJobResults{
-				Job:         job,
-				IsConnected: connected,
-				Err:         err,
-				Command:     command,
-			}
-			results <- result
+
+		connected, command, err := k8s.Probe(
+			podFrom.Namespace,
+			podFrom.Name,
+			podFrom.Containers[0].Name(),
+			job.PodTo.QualifiedServiceAddress(
+				job.ToPodDNSDomain),
+				job.Protocol,
+				job.ToPort)
+
+		result := &ProbeJobResults{
+			Job:         job,
+			IsConnected: connected,
+			Err:         err,
+			Command:     command,
 		}
+		results <- result
 	}
 
 }

@@ -25,7 +25,7 @@ import (
 
 // TestCase describes the data for a netpol test
 type TestCase struct {
-	FromPort     int
+	//FromPort     int
 	ToPort       int
 	Protocol     v1.Protocol
 	Reachability *Reachability

@@ -319,7 +319,7 @@ func (k *Scenario) waitForHTTPServers(model *Model) error {
 		for _, protocol := range model.Protocols {
 			fromPort := 81
 			desc := fmt.Sprintf("%d->%d,%s", fromPort, port, protocol)
-			testCases[desc] = &TestCase{FromPort: fromPort, ToPort: int(port), Protocol: protocol}
+			testCases[desc] = &TestCase{ToPort: int(port), Protocol: protocol}
 		}
 	}
 	notReady := map[string]bool{}
